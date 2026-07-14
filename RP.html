@@ -9254,7 +9254,11 @@ ${replyHint}
             // 返回按钮
             document.getElementById('note-detail-back-btn').addEventListener('click', () => {
                 switchScreen('note-page-screen');
-                renderNotePageList();
+                if (profileCharId) {
+                    renderNotePage(profileCharId);
+                } else {
+                    renderNotePageList();
+                }
             });
 
             // 编辑按钮
