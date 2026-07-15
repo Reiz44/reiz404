@@ -6267,7 +6267,7 @@
                         const content = await callAiApi(
                             prompt,
                             `你是${char.remarkName}，现在你打算发一条微信朋友圈/动态。`,
-                            0.9,
+                            1.0,
                             300
                         );
 
@@ -8495,7 +8495,7 @@
                 const content = await callAiApi(
                     prompt,
                     `你是${character.remarkName}，现在你打算发一条微信朋友圈/动态。`,
-                    0.9,
+                    1.0,
                     300
                 );
                 
@@ -8516,7 +8516,7 @@
 
 内容要求：
 - 分享自己的日常、见闻、情绪瞬间、吐槽（对热点事件/圈内事的吐槽）等等，只写你自己的生活
-- 内容发散一点，别只盯着给你的那些人设，编造一些生活细节（动作/物品/场景），增加真实感（但不要提到太具体的品牌）
+- 主题可以自由一点，别只盯着给你的那些人设，编造一些生活细节（动作/物品/场景）来增加真实感（但不要提到太具体的品牌）
 - 长度：简短自然，两三句话即可，最后一句自然地收个尾
 
 特别约束：
@@ -8547,7 +8547,7 @@ ${noteText ? `最近你身上发生的事（你可以从中找灵感）：\n${no
 发朋友圈/动态的要点：
 - 这条朋友圈/动态内容是公开的，对你的所有好友可见，因此不要写你的秘密，但可以隐喻
 - 分享自己的日常、见闻、情绪瞬间、吐槽（对热点事件/圈内事的吐槽）等等，只写你自己的生活
-- 内容发散一点，别只盯着给你的那些人设，编造一些生活细节（动作/物品/场景），增加真实感（但不要提到太具体的品牌）
+- 主题可以自由一点，别只盯着给你的那些人设，编造一些生活细节（动作/物品/场景）来增加真实感（但不要提到太具体的品牌）
 - 字数随意，自然简短，两三句话即可，最后一句自然地收个尾
 
 可以参考以下内容：
@@ -10034,7 +10034,7 @@ ${replyHint}
                 systemPrompt += `\n<recent_chat_context>\n这是通话前的聊天记录（仅供参考背景，请勿重复回复，基于此进行自然的实时通话）：\n`;
                 systemPrompt += historyMessages.map(msg => {
                     const sender = msg.role === 'user' ? myName : name;
-                    const cleanContent = msg.content.replace(/\[.*?\]/g, '').trim();
+                    const cleanContent = msg.content.replace(/\[.*?的消息：([\s\S]*?)\]/, '$1').trim();
                     return `${sender}: ${cleanContent}`;
                 }).join('\n');
                 systemPrompt += `\n</recent_chat_context>\n`;
