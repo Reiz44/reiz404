@@ -233,7 +233,7 @@
         }
 
         .time-widget .time {
-            font-size: 72px;
+            font-size: 76px;
             font-weight: 600;
         }
 
@@ -1190,7 +1190,7 @@
             display: flex;
             align-items: center;
             padding: 4px 8px 0;
-            gap: 6px;
+            gap: 4px;
         }
 
         .sticker-bar-btn {
@@ -3682,7 +3682,7 @@
         
         /* --- Hangup Button Styles --- */
         .vc-btn-hangup {
-            background: rgba(231, 76, 60, 0.7);
+            background: rgba(231, 60, 83, 0.7);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             color: #fff;
@@ -4312,7 +4312,7 @@
     <!-- 笔记页面 -->
     <div id="note-page-screen" class="screen">
         <header class="app-header">
-            <button class="back-btn" data-target="char-profile-screen"><i data-lucide="arrow-left"></i></button>
+            <button class="back-btn" id="note-page-back-btn"><i data-lucide="arrow-left"></i></button>
             <div class="title-container">
                 <h1 class="title" id="note-page-title">笔记</h1>
             </div>
@@ -5528,6 +5528,7 @@
                 if (backBtn) {
                     e.preventDefault();
                     let target = backBtn.getAttribute('data-target');
+                    if (!target) return; // 没有 data-target 的按钮由各自的显式 handler 处理，此处跳过
                     // 从 profile 进入角色主页后，返回按钮应回到 profile
                     if (target === 'chat-room-screen' && document.getElementById('char-profile-screen').classList.contains('active') && sessionStorage.getItem('profileToCharProfile') === 'true') {
                         target = 'contacts-screen';
@@ -8944,8 +8945,8 @@ ${replyHint}
         }
         
         // 生成笔记
-        async function generateNote() {
-            const character = db.characters.find(c => c.id === currentChatId);
+        async function generateNote(charId) {
+            const character = db.characters.find(c => c.id === (charId || currentChatId));
             if (!character) {
                 showToast('角色不存在');
                 return;
@@ -9245,6 +9246,15 @@ ${replyHint}
         }
 
         function setupNotePageScreen() {
+            // 笔记列表返回按钮
+            document.getElementById('note-page-back-btn').addEventListener('click', () => {
+                switchScreen('char-profile-screen');
+                if (profileCharId) {
+                    const character = db.characters.find(c => c.id === profileCharId);
+                    if (character) renderCharProfile(character);
+                }
+            });
+
             // 搜索输入
             const searchInput = document.getElementById('note-page-search');
             searchInput.addEventListener('input', () => {
@@ -9266,12 +9276,7 @@ ${replyHint}
                     showToast('请先选择一个角色');
                     return;
                 }
-                // 临时设置 currentChatId 以便复用生成逻辑
-                const savedChatId = currentChatId;
-                currentChatId = profileCharId;
-                currentChatType = 'private';
-                await generateNote();
-                currentChatId = savedChatId;
+                await generateNote(profileCharId);
                 // 刷新页面列表和预览
                 renderNotePageList();
                 // 如果 profile 也在显示，刷新其预览
@@ -9288,7 +9293,7 @@ ${replyHint}
             // 返回按钮
             document.getElementById('note-detail-back-btn').addEventListener('click', () => {
                 switchScreen('note-page-screen');
-                if (profileCharId) {
+                if (profileCharId && db.characters.find(c => c.id === profileCharId)) {
                     renderNotePage(profileCharId);
                 } else {
                     renderNotePageList();
@@ -10007,26 +10012,47 @@ ${replyHint}
             }
 
             const now = new Date();
-            const timeStr = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
-            const name = chat.remarkName || chat.realName || 'AI';
+               const timeStr = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+         const name = chat.remarkName || chat.realName || 'AI';
             const myName = chat.myName || '用户';
 
             let systemPrompt = `你正在与${myName}进行语音通话。你的名字是${name}。`;
             systemPrompt += `\n当前时间：${timeStr}`;
-            systemPrompt += `\n角色设定：${chat.persona || '一个友好的人'}`;
-            systemPrompt += `\n\n这是通话中的对话记录（最新的在后）：\n`;
+            // 角色设定
+            systemPrompt += `\n\n<char_settings>\n`;
+            systemPrompt += `你的角色名：${name}\n`;
+            systemPrompt += `角色设定：${chat.persona || '一个友好的人'}\n`;
+            systemPrompt += `</char_settings>\n`;
+            // 用户设定
+            systemPrompt += `<user_settings>\n`;
+            systemPrompt += `对方称呼：${myName}\n`;
+            systemPrompt += `对方人设：${chat.myPersona || '无特定人设'}\n`;
+            systemPrompt += `</user_settings>\n`;
+            // 通话前的聊天历史
+            const historyMessages = (chat.history || []).slice(-10);
+            if (historyMessages.length > 0) {
+                systemPrompt += `\n<recent_chat_context>\n这是通话前的聊天记录（仅供参考背景，请勿重复回复，基于此进行自然的实时通话）：\n`;
+                systemPrompt += historyMessages.map(msg => {
+                    const sender = msg.role === 'user' ? myName : name;
+                    const cleanContent = msg.content.replace(/\[.*?\]/g, '').trim();
+                    return `${sender}: ${cleanContent}`;
+                }).join('\n');
+                systemPrompt += `\n</recent_chat_context>\n`;
+            }
+
+            // 当前通话记录
+            systemPrompt += `\n【当前通话】\n`;
             systemPrompt += callContext.map(m => {
                 const who = m.role === 'ai' ? name : myName;
                 const tag = m.type === 'visual' ? '环境' : '说话';
                 return `${who} (${tag}): ${m.content}`;
             }).join('\n') || '(通话刚开始)';
 
-            systemPrompt += `\n\n回复规则：
-1. 保持口语化，像真实通话一样自然简短（15-50字）。
-2. 如果要描述环境音，用格式：[环境音：描述]
-3. 说话内容直接输出，不需要加格式标签。
-4. 不要主动结束通话，自然地继续对话。
-5. 如果通话刚开始，说一句自然的开场白。`;
+            systemPrompt += `\n\n【回复规则】
+1. 这是实时通话，请保持口语化，像真人一样自然简短（15-50字），语气自然；
+2. 如果要描述环境音，用格式：[环境音：描述]，放在内容开口或结尾；
+3. 说话内容直接输出，不需要加格式标签；
+4. 不要主动结束通话，自然地继续对话。`;
 
             const fnUrl = url.endsWith('/') ? url.slice(0, -1) : url;
             let endpoint, requestBody, headers;
@@ -10079,11 +10105,23 @@ ${replyHint}
             const name = chat.remarkName || chat.realName || 'AI';
             const myName = chat.myName || '用户';
 
-            let prompt = `请根据以下语音通话记录，用第三人称生成一段简短的总结（30-60字）：\n\n`;
-            prompt += `角色：${name}\n`;
+            let prompt = `请根据以下背景信息和通话记录，生成一段简短的聊天记录总结。\n\n`;
+            prompt += `<char_settings>\n`;
+            prompt += `角色名：${name}\n`;
+            prompt += `角色设定：${chat.persona || '无'}\n`;
+            prompt += `</char_settings>\n\n`;
+            prompt += `<user_settings>\n`;
+            prompt += `用户称呼：${myName}\n`;
+            prompt += `用户人设：${chat.myPersona || '无'}\n`;
+            prompt += `</user_settings>\n\n`;
             prompt += `通话记录：\n`;
-            prompt += callContext.map(m => `${m.role === 'ai' ? name : myName}: ${m.content}`).join('\n');
-            prompt += `\n\n要求：客观陈述，不升华，不加引号，直接输出总结内容。`;
+            prompt += callContext.map(m => `${m.role === 'ai' ? name : myName} (${m.type}): ${m.content}`).join('\n');
+
+            prompt += `\n\n要求：
+1. 第三人称叙述；
+2. 客观平实，绝对禁止使用强烈的情绪词汇；
+3. 无升华，不要进行总结性评价；
+4. 直接输出总结内容，不要包含"通话记录如下"等废话。`;
 
             const fnUrl = url.endsWith('/') ? url.slice(0, -1) : url;
             let endpoint, requestBody, headers;
