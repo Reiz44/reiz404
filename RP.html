@@ -492,7 +492,7 @@
         #world-book-screen #world-book-list-container {
             display: flex;
             flex-direction: column;
-            gap: 12px;
+            gap: 16px;
             padding: 0 20px 20px;
         }
 
@@ -864,13 +864,12 @@
         }
 
         .voice-transcript {
-            font-size: 14px;
+            font-size: 13px;
             color: #555;
             background-color: rgba(255, 255, 255, 0.7);
             padding: 8px 12px;
-            margin-top: 5px;
-            margin-left: 54px;
-            margin-right: 54px;
+            margin-left: 44px;
+            margin-right: 44px;
             border-radius: var(--radius-sm);
             line-height: 1.6;
             max-width: calc(100% - 108px);
@@ -884,14 +883,61 @@
 
         .message-wrapper.sent .voice-transcript {
             align-self: flex-end;
-            margin-right: 54px;
+            margin-right: 44px;
             margin-left: auto;
         }
 
         .message-wrapper.received .voice-transcript {
             align-self: flex-start;
-            margin-left: 54px;
+            margin-left: 44px;
             margin-right: auto;
+        }
+
+        /* 通话记录卡片 */
+        .call-record-bubble {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 14px;
+            border-radius: var(--radius-md);
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            margin: 0 8px;
+            cursor: default;
+            font-size: 14px;
+            white-space: nowrap;
+            transition: all 0.2s ease;
+            min-width: 120px;
+        }
+
+        .message-wrapper.sent .call-record-bubble {
+            border-bottom-right-radius: 5px;
+        }
+
+        .message-wrapper.received .call-record-bubble {
+            border-bottom-left-radius: 5px;
+        }
+
+        .call-record-bubble .call-icon {
+            width: 18px;
+            height: 18px;
+            flex-shrink: 0;
+        }
+
+        .call-record-bubble .call-label {
+            font-weight: 500;
+        }
+
+        .call-record-bubble .call-status {
+            font-size: 12px;
+            opacity: 0.7;
+        }
+
+        .message-wrapper.system-notification .voice-transcript {
+            margin-left: 8px;
+            margin-right: 8px;
+            max-width: 280px;
+            text-align: center;
         }
 
         .pv-card {
@@ -1947,10 +1993,10 @@
             align-items: center;
             padding: 12px 16px;
             border-radius: var(--radius-md);
-            border: 1px solid var(--neutral-light);
+            border: 2px solid var(--primary-color);
             border-left: 4px solid var(--primary-color);
             background: var(--white-color);
-            box-shadow: var(--shadow-1);
+            box-shadow: var(--shadow-2);
             cursor: pointer;
             transition: box-shadow 0.2s, border-color 0.2s;
             position: relative;
@@ -3682,7 +3728,7 @@
         
         /* --- Hangup Button Styles --- */
         .vc-btn-hangup {
-            background: rgba(231, 60, 83, 0.7);
+            background: rgba(255, 72, 121, 0.8);
             backdrop-filter: blur(16px);
             -webkit-backdrop-filter: blur(16px);
             color: #fff;
@@ -3719,7 +3765,7 @@
             mask-composite: exclude;
             pointer-events: none;
         }
-
+        
         .vc-btn-hangup .lucide { transform: rotate(135deg); }
         .vc-btn-accept {
             background: #2ecc71;
@@ -3775,7 +3821,7 @@
             padding: 8px 16px;
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 12px;
             scroll-behavior: smooth;
         }
         .vc-chat-container::-webkit-scrollbar { width: 3px; }
@@ -3804,11 +3850,6 @@
             background: rgba(255,255,255,0.1);
             color: #fff;
             border-bottom-left-radius: 4px;
-        }
-        .vc-msg-ai .vc-msg-name {
-            font-size: 11px;
-            color: rgba(255,255,255,0.5);
-            margin-bottom: 2px;
         }
         
         /* 环境音：居中浮动，独立于气泡 */
@@ -6253,7 +6294,7 @@
                     return;
                 }
 
-                const count = candidates.length === 1 ? 1 : (Math.random() < 0.6 ? 1 : 2);
+                const count = 1;
                 const shuffled = [...candidates].sort(() => Math.random() - 0.5);
                 const selected = shuffled.slice(0, count);
 
@@ -6466,10 +6507,10 @@
                         const stickerRegex = /\[.*?的表情包：.*?\]|\[.*?发送的表情包：.*?\]/;
                         const giftRegex = /\[.*?送来的礼物：.*?\]|\[.*?向.*?送来了礼物：.*?\]/;
 
-
-
                         if (giftRegex.test(lastMsg.content)) {
                             lastMessageText = '[礼物]';
+                        } else if (/\[.+?向.+?发起了语音通话\]/.test(lastMsg.content)) {
+                            lastMessageText = '[语音通话]';
                         } else if (stickerRegex.test(lastMsg.content)) {
                             lastMessageText = '[表情包]';
                         } else if (voiceRegex.test(lastMsg.content)) {
@@ -6491,10 +6532,13 @@
                         const lastEverMsg = chat.history[chat.history.length - 1];
                         const inviteRegex = /\[(.*?)邀请(.*?)加入了群聊\]/;
                         const renameRegex = /\[.*?修改群名为：.*?\]/;
+                        const callRecordRegex = /\[system-display:语音通话记录：.*?；.*?；.*?\]/;
                         const timeSkipRegex = /\[system-display:([\s\S]+?)\]/;
                         const timeSkipMatch = lastEverMsg.content.match(timeSkipRegex);
 
-                        if (timeSkipMatch) {
+                        if (callRecordRegex.test(lastEverMsg.content)) {
+                            lastMessageText = '[语音通话]';
+                        } else if (timeSkipMatch) {
                             lastMessageText = timeSkipMatch[1];
                         } else if (inviteRegex.test(lastEverMsg.content)) {
                             lastMessageText = '新成员加入了群聊';
@@ -7824,11 +7868,12 @@
             const isPhotoVideoMessage = /\[.*?发来的照片\/视频：.*?\]/.test(message.content);
             const isTransferMessage = /\[.*?给你转账：.*?\]|\[.*?的转账：.*?\]|\[.*?向.*?转账：.*?\]/.test(message.content);
             const isGiftMessage = /\[.*?送来的礼物：.*?\]|\[.*?向.*?送来了礼物：.*?\]/.test(message.content);
+            const isCallRecordMessage = /\[.+?向.+?发起了语音通话\]/.test(message.content);
             const isInvisibleMessage = /\[.*?(?:接收|退回).*?的转账\]|\[.*?更新状态为：.*?\]|\[.*?已接收礼物\]|\[system:.*?\]|\[.*?邀请.*?加入了群聊\]|\[.*?修改群名为：.*?\]|\[system-display:.*?\]/.test(message.content);
 
             let menuItems = [];
             // 添加引用选项（排除不可引用的消息类型）
-            if (!isImageRecognitionMsg && !isVoiceMessage && !isStickerMessage && !isPhotoVideoMessage && !isTransferMessage && !isGiftMessage && !isInvisibleMessage) {
+            if (!isImageRecognitionMsg && !isVoiceMessage && !isStickerMessage && !isPhotoVideoMessage && !isTransferMessage && !isGiftMessage && !isCallRecordMessage && !isInvisibleMessage) {
                 menuItems.push({label: '引用', action: () => startQuoteReply(messageId)});
                 menuItems.push({label: '编辑', action: () => startMessageEdit(messageId)});
             }
@@ -8039,7 +8084,7 @@
             const timeSkipMatch = content.match(timeSkipRegex);
             const inviteMatch = content.match(inviteRegex);
             const renameMatch = content.match(renameRegex);
-            const invisibleRegex = /\[.*?(?:接收|退回).*?的转账\]|\[.*?更新状态为：.*?\]|\[.*?已接收礼物\]|\[system:.*?\]/;
+            const invisibleRegex = /\[.*?(?:接收|退回).*?的转账\]|\[.*?更新状态为：.*?\]|\[.*?已接收礼物\]|\[system:(?!display)[^\]]*?\]/;
             if (invisibleRegex.test(content)) {
                 return null;
             }
@@ -8047,8 +8092,48 @@
             const wrapper = document.createElement('div');
             wrapper.dataset.id = id;
 
-            if (timeSkipMatch || inviteMatch || renameMatch) {
+            // 通话记录（有发起者信息）→ 走正常消息路径，不居中
+            if (timeSkipMatch && message.callInitiator) {
+                // 直接放行到下面的 sent/received 渲染
+            } else if (timeSkipMatch || inviteMatch || renameMatch) {
                 wrapper.className = 'message-wrapper system-notification';
+
+                if (timeSkipMatch) {
+                    const callRecordRegex = /语音通话记录：(.*?)；(.*?)；(.*)/;
+                    const callRejectRegex = /语音通话：(.+?)的来电被拒绝/;
+                    const callRecordMatch = timeSkipMatch[1].match(callRecordRegex);
+                    const callRejectMatch = timeSkipMatch[1].match(callRejectRegex);
+
+                    if (callRecordMatch) {
+                        const duration = callRecordMatch[2].trim();
+                        const summary = callRecordMatch[3].trim();
+
+                        const bubbleDiv = document.createElement('div');
+                        bubbleDiv.className = 'call-record-bubble';
+                        bubbleDiv.style.backgroundColor = 'rgba(76, 175, 80, 0.12)';
+                        bubbleDiv.innerHTML = `<i data-lucide="phone" class="call-icon" style="color:#4CAF50;stroke-width:2"></i><span class="call-label" style="color:#4CAF50">语音通话</span><span class="call-status" style="color:#4CAF50">${escapeHTML(duration)}</span>`;
+                        wrapper.appendChild(bubbleDiv);
+
+                        if (summary && summary !== '总结生成中…') {
+                            const transcriptDiv = document.createElement('div');
+                            transcriptDiv.className = 'voice-transcript active';
+                            transcriptDiv.textContent = summary;
+                            wrapper.appendChild(transcriptDiv);
+                        }
+
+                        return wrapper;
+                    }
+
+                    if (callRejectMatch) {
+                        const bubbleDiv = document.createElement('div');
+                        bubbleDiv.className = 'call-record-bubble';
+                        bubbleDiv.style.backgroundColor = 'rgba(231, 76, 60, 0.1)';
+                        bubbleDiv.innerHTML = `<i data-lucide="phone-off" class="call-icon" style="color:#e74c3c;stroke-width:2"></i><span class="call-label" style="color:#e74c3c">语音通话</span><span class="call-status" style="color:#e74c3c">未接</span>`;
+                        wrapper.appendChild(bubbleDiv);
+                        return wrapper;
+                    }
+                }
+
                 const bubbleDiv = document.createElement('div');
                 bubbleDiv.className = 'system-notification-bubble';
                 if (timeSkipMatch) bubbleDiv.textContent = timeSkipMatch[1];
@@ -8117,6 +8202,10 @@
             const imageRecogMatch = content.match(imageRecogRegex);
             const textMatch = content.match(textRegex);
             const aiQuoteMatch = content.match(aiQuoteRegex);
+            const callInviteRegex = /\[(.+?)向(.+?)发起了语音通话\]/;
+            const callInviteMatch = content.match(callInviteRegex);
+            const callRecordSummaryRegex = /\[system-display:语音通话记录：(.*?)；(.*?)；(.*)\]/;
+            const callRecordSummaryMatch = content.match(callRecordSummaryRegex);
 
 
 
@@ -8271,6 +8360,30 @@
 
                 const remarkHTML = remarkText ? `<p class="transfer-remark">${escapeHTML(remarkText)}</p>` : '';
                 bubbleElement.innerHTML = `<div class="overlay"></div><div class="transfer-content"><p class="transfer-title">${escapeHTML(titleText)}</p><p class="transfer-amount">¥${escapeHTML(amount)}</p>${remarkHTML}<p class="transfer-status">${escapeHTML(statusText)}</p></div>`;
+            } else if (callInviteMatch) {
+                bubbleElement = document.createElement('div');
+                bubbleElement.className = 'call-record-bubble';
+                if (!chat.useCustomBubbleCss) {
+                    bubbleElement.style.backgroundColor = bubbleTheme.bg;
+                    bubbleElement.style.color = bubbleTheme.text;
+                }
+                bubbleElement.innerHTML = `<i data-lucide="phone" class="call-icon" style="color:#4CAF50;stroke-width:2"></i><span class="call-label">语音通话</span><span class="call-status">已呼叫</span>`;
+            } else if (callRecordSummaryMatch) {
+                const duration = callRecordSummaryMatch[2].trim();
+                const summary = callRecordSummaryMatch[3].trim();
+                bubbleElement = document.createElement('div');
+                bubbleElement.className = 'call-record-bubble';
+                if (!chat.useCustomBubbleCss) {
+                    bubbleElement.style.backgroundColor = bubbleTheme.bg;
+                    bubbleElement.style.color = bubbleTheme.text;
+                }
+                bubbleElement.innerHTML = `<i data-lucide="phone" class="call-icon" style="color:#4CAF50;stroke-width:2"></i><span class="call-label">语音通话</span><span class="call-status">${escapeHTML(duration)}</span>`;
+                if (summary && summary !== '总结生成中…') {
+                    const transcriptDiv = document.createElement('div');
+                    transcriptDiv.className = 'voice-transcript active';
+                    transcriptDiv.textContent = summary;
+                    wrapper.appendChild(transcriptDiv);
+                }
             } else if (imageRecogMatch || urlRegex.test(content)) {
                 bubbleElement = document.createElement('div');
                 bubbleElement.className = 'image-bubble';
@@ -8510,19 +8623,26 @@
         // 构建AI动态生成提示词（纯人设版，不依赖用户互动）
         function buildFreeAiMomentPrompt(character) {
             const persona = character.persona || '一个友善的伙伴';
-            const prompt = `你是${character.remarkName}。你正在发一条微信朋友圈/动态/推文，分享你的日常生活。
+            const now = new Date();
+            const timeStr = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            const prompt = `你正在扮演${character.remarkName}，请以Ta的视角发一条微信朋友圈/动态。
+当前时间：${timeStr}
 
-你的性格和生活：${persona}
+${character.remarkName}的性格和生活：${persona}
 
 内容要求：
-- 分享自己的日常、见闻、情绪瞬间、吐槽（对热点事件/圈内事的吐槽）等等，只写你自己的生活
-- 主题可以自由一点，别只盯着给你的那些人设，编造一些生活细节（动作/物品/场景）来增加真实感（但不要提到太具体的品牌）
-- 长度：简短自然，两三句话即可，最后一句自然地收个尾
+- 内容随意，符合人设即可，可以是日常、情绪瞬间、吐槽（对热点事件/圈内事的吐槽）等等
+- 突出一些细节（动作/物品/场景）来增加真实感（但不要提到太具体的品牌）
+- 长度：简短自然
 
 特别约束：
 - 通常情况下，不直接提到“我”以外的其他人称（如“你”等），如果出现其他人物可按关系称呼
 - 不用提及到[user]，或者只作为背景存在，不正面出现
-- 语气符合你的性格和语言习惯
+- 语气符合角色的性格和语言习惯
+
+例如：
+- “有人送了我一张绝版唱片，退回去三次都没成功，现在还在我抽屉里。到底是谁送的？”（分享生活日常）
+- “第一次没赶deadline，结果被项目组批了，我真想死。”（分享情绪、工作）
 
 直接输出内容，不要加任何前缀。`;
             return prompt;
@@ -8532,27 +8652,35 @@
         function buildAiMomentPrompt(character, notes) {
             const persona = character.persona || '一个友善的伙伴';
             
-            // 格式化笔记
+            // 格式化笔记（带日期）
             let noteText = '';
             if (notes.length > 0) {
-                noteText = notes.map(m => `- ${m.content}`).join('\n');
+                noteText = notes.map(m => {
+                    const d = new Date(m.timestamp);
+                    const dateStr = `${d.getMonth()+1}/${d.getDate()}`;
+                    return `- [${dateStr}] ${m.content}`;
+                }).join('\n');
             }
             
-            const prompt = `你是${character.remarkName}。现在你打算发一条微信朋友圈/动态，很日常的那种。
+            const now = new Date();
+            const timeStr = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
+            const prompt = `你正在扮演${character.remarkName}，请以Ta的视角发一条微信朋友圈/动态。
+当前时间：${timeStr}
 
 你的性格和生活是这样的：${persona}
 
 ${noteText ? `最近你身上发生的事（你可以从中找灵感）：\n${noteText}\n` : ''}
 
-发朋友圈/动态的要点：
+内容要求：
 - 这条朋友圈/动态内容是公开的，对你的所有好友可见，因此不要写你的秘密，但可以隐喻
-- 分享自己的日常、见闻、情绪瞬间、吐槽（对热点事件/圈内事的吐槽）等等，只写你自己的生活
-- 主题可以自由一点，别只盯着给你的那些人设，编造一些生活细节（动作/物品/场景）来增加真实感（但不要提到太具体的品牌）
-- 字数随意，自然简短，两三句话即可，最后一句自然地收个尾
+- 内容随意，符合人设即可，可以是日常、情绪瞬间、吐槽（对热点事件/圈内事的吐槽）等等
+- 突出一些细节（动作/物品/场景）来增加真实感（但不要提到太具体的品牌）
+- 字数随意，自然简短
 
 可以参考以下内容：
-- “凌晨五点，新的demo终于过了，在沙发上躺着刷手机，翻到一条糊成马赛克的视频看了两遍。算了，睡吧，一个小时以后还得起来干活。谁他妈规定的太阳升起来人就得清醒的？”（分享情绪、日常）
-- “最近工作室换了新邮箱，工作请发邮件：CY@Soralis.com。别直接找我，找了也不一定回。”（分享生活、工作）
+- “凌晨五点，新的demo终于过了。原来通宵是这种感觉，还不赖。”
+- “最近工作室换了新邮箱，工作请发邮件：CY@Soralis.com。别直接找我，找了也不一定回。”
+- “最近怎么老有人问热搜上那对是不是真的？别问了，假的。就说这一次，再问拉黑。”
 
 直接输出内容就行，不要加任何前缀。`;
 
@@ -8605,13 +8733,14 @@ ${noteText ? `最近你身上发生的事（你可以从中找灵感）：\n${no
                     }
                 });
             } else {
-                // 没有@，让有聊天记录的角色评论（最多3个）
+                // 没有@，随机选有聊天记录的角色评论（最多5个）
                 if (!db.characters || db.characters.length === 0) return;
                 const candidates = db.characters
-                    .filter(c => c.history && c.history.length > 0)
-                    .slice(0, 3);
+                    .filter(c => c.history && c.history.length > 0);
                 if (candidates.length === 0) return;
-                candidates.forEach(async character => {
+                const shuffled = [...candidates].sort(() => Math.random() - 0.5);
+                const selected = shuffled.slice(0, 5);
+                selected.forEach(async character => {
                     await generateAiCommentForMoment(moment, character);
                 });
             }
@@ -9602,7 +9731,7 @@ ${replyHint}
     h) 对我礼物的回应(此条不显示): [${character.realName}已接收礼物]
     i) 对我转账的回应(此条不显示): [${character.realName}接收${character.myName}的转账] 或 [${character.realName}退回${character.myName}的转账]
     j) 更新状态(此条不显示): [${character.realName}更新状态为：{新状态}]（状态文本最多26个字符）
-    k) 发起语音通话(此条不显示): [${character.realName}向${character.myName}发起了语音通话]
+    k) 发起语音通话(将渲染为通话卡片): [${character.realName}向${character.myName}发起了语音通话]
 `;
             prompt += `12. 你的每次回复可以生成3到8条消息。这些消息应以普通文本消息为主，可以偶尔、选择性地穿插一条特殊消息（如礼物、语音、图片、表情包等），特殊消息的位置应随机。大部分回复应该只包含文本消息。\n`;
             prompt += `13. 不要主动结束对话，除非我明确提出。保持你的人设，自然地进行对话。`;
@@ -9864,7 +9993,7 @@ ${replyHint}
                 if (voice) {
                     const div = document.createElement('div');
                     div.className = 'vc-msg vc-msg-ai';
-                    div.innerHTML = `<div class="vc-msg-name">${name}</div>${escapeHTML(voice)}`;
+                    div.innerHTML = escapeHTML(voice);
                     container.appendChild(div);
                     container.scrollTop = container.scrollHeight;
                     this.state.currentCallContext.push({ role: 'ai', type: 'voice', content: voice });
@@ -9924,12 +10053,14 @@ ${replyHint}
 
                     if (duration > 0 || this.state.isCallActive) {
                         // 有实质通话（接通后挂断）
+                        const callInitiator = this.state.isIncoming ? 'ai' : 'user';
                         const summaryMsg = {
                             id: `msg_call_${Date.now()}_${Math.random().toString(36).slice(2,5)}`,
-                            role: 'system',
+                            role: callInitiator === 'user' ? 'user' : 'assistant',
                             content: `[system-display:语音通话记录：${dateStr}；${durationStr}；总结生成中…]`,
                             timestamp: Date.now(),
-                            callRecordId: `call_${Date.now()}`
+                            callRecordId: `call_${Date.now()}`,
+                            callInitiator: callInitiator
                         };
                         chat.history.push(summaryMsg);
                         await saveData();
