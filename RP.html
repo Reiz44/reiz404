@@ -645,7 +645,7 @@
             margin-top: 12px;
         }
 
-        #char-profile-content .profile-bio .bio-edit-area textarea { /* 角色个人简介编辑文本框 */
+        #char-profile-content .profile-bio .bio-edit-area textarea {
             width: 100%;
             min-height: 60px;
             padding: 12px;
@@ -656,18 +656,18 @@
             box-sizing: border-box;
         }
 
-        #char-profile-content .profile-bio .bio-edit-area .bio-char-count { /* 角色个人简介编辑字符计数 */
+        #char-profile-content .profile-bio .bio-edit-area .bio-char-count {
             font-size: 11px;
             color: var(--neutral-color);
             text-align: right;
         }
 
-        #char-profile-content .profile-bio .bio-edit-area .bio-edit-btns { /* 角色个人简介编辑按钮 */
+        #char-profile-content .profile-bio .bio-edit-area .bio-edit-btns {
             display: flex;
             gap: 8px;
         }
 
-        #char-profile-content .profile-bio .bio-edit-area .bio-edit-btns .btn { /* 角色个人简介编辑按钮 */
+        #char-profile-content .profile-bio .bio-edit-area .bio-edit-btns .btn {
             flex: 1;
         }
 
@@ -933,6 +933,7 @@
             flex-shrink: 0;
             stroke-width: 2;
         }
+
         .call-record-bubble .call-icon-green { color: #4CAF50; }
         .call-record-bubble .call-icon-red { color: #e74c3c; }
 
@@ -3527,7 +3528,7 @@
             font-size: 15px;
             font-weight: 600;
             color: var(--text-color);
-            margin: 0 0 12px 0;
+            margin: 0 0 16px 0;
             display: flex;
             align-items: center;
             gap: 6px;
@@ -3611,45 +3612,63 @@
             pointer-events: none;
         }
 
-        /* Collection placeholder */
-        .profile-collection-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
+        /* Collection Screen */
+        .collection-filter-area {
+            display: flex;
+            flex-wrap: wrap;
             gap: 8px;
-            min-height: 120px;
+            padding: 8px 16px;
+            margin-bottom: 4px;
         }
 
-        .profile-collection-item {
-            aspect-ratio: 1;
-            border-radius: var(--radius-sm);
-            background: var(--bg-color);
-            display: flex;
+        .collection-filter-chip {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            color: var(--neutral-light);
+            gap: 4px;
+            padding: 4px 12px;
+            border-radius: 20px;
             font-size: 12px;
-            box-shadow: var(--shadow-1);
+            cursor: pointer;
+            border: 1px solid var(--border-color, #ddd);
+            background: var(--bg-color, #fff);
+            transition: all 0.15s;
+            user-select: none;
         }
 
-        .profile-collection-empty {
-            grid-column: 1 / -1;
-            display: flex;
-            flex-direction: column;
+        .collection-filter-chip.active {
+            background: var(--primary-color, #ff8c42);
+            color: #fff;
+            border-color: var(--primary-color, #ff8c42);
+        }
+
+        .collection-filter-chip img {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            object-fit: cover;
+        }
+
+        .collection-note-item {
+            position: relative;
+        }
+
+        .collection-note-tag {
+            display: inline-flex;
             align-items: center;
-            justify-content: center;
-            gap: 8px;
-            padding: 32px 0;
-            color: var(--neutral-light);
+            gap: 4px;
+            font-size: 11px;
+            padding: 2px 12px;
+            border-radius: var(--radius-sm);
+            background: var(--tag-bg, #f0f0f0);
+            color: var(--tag-color, #666);
+            flex-shrink: 0;
         }
 
-        .profile-collection-empty .lucide {
-            width: 32px;
-            height: 32px;
-            stroke-width: 1.5;
-        }
-
-        .profile-collection-empty span {
-            font-size: 13px;
+        .collection-note-tag img {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            object-fit: cover;
         }
 
         /* Profile Edit Modal */
@@ -4321,12 +4340,19 @@
             <!-- 收藏区 -->
             <div class="profile-section">
                 <h3 class="profile-section-title">
-                    <i data-lucide="bookmark"></i> Collection
+                    <i data-lucide="bookmark" style="width:16px;height:16px;"></i> Collection
                 </h3>
-                <div class="profile-collection-grid" id="profile-collection-grid">
-                    <div class="profile-collection-empty">
-                        <i data-lucide="inbox"></i>
-                        <span>暂无收藏内容</span>
+                <div class="profile-feature-card" id="profile-collection-card">
+                    <div class="profile-feature-card-header">
+                        <i data-lucide="file-text" style="width:16px;height:16px;"></i>
+                        <span>笔记收藏</span>
+                        <span class="profile-feature-card-arrow" id="profile-collection-info">
+                            <span class="profile-feature-card-date" id="profile-collection-count"></span>
+                            <i data-lucide="chevron-right" style="width:14px;height:14px;"></i>
+                        </span>
+                    </div>
+                    <div class="profile-feature-card-preview" id="profile-collection-preview">
+                        <span class="placeholder">暂无收藏内容</span>
                     </div>
                 </div>
             </div>
@@ -4404,6 +4430,21 @@
         <main class="content" style="padding: 16px;">
             <div id="note-detail-meta" class="note-detail-meta"></div>
             <div id="note-detail-body" class="note-detail-body"></div>
+        </main>
+    </div>
+
+    <!-- 收藏页面 -->
+    <div id="collection-screen" class="screen">
+        <header class="app-header">
+            <button class="back-btn" id="collection-back-btn"><i data-lucide="arrow-left"></i></button>
+            <div class="title-container">
+                <h1 class="title">我的收藏</h1>
+            </div>
+            <div class="placeholder"></div>
+        </header>
+        <main class="content">
+            <div class="collection-filter-area" id="collection-filter-area"></div>
+            <div id="collection-list-container" class="note-list-container"></div>
         </main>
     </div>
 
@@ -5439,6 +5480,7 @@
             if (targetId === 'contacts-screen') {
                 renderProfile();
                 renderFriendList();
+                if (typeof lucide !== 'undefined') lucide.createIcons();
             }
         };
         const pad = (num) => num.toString().padStart(2, '0');
@@ -5627,6 +5669,7 @@
             setupVoiceMessageSystem();
             setupNavSystem();
             setupProfileScreen();
+            setupCollectionScreen();
             setupPhotoVideoSystem();
             setupImageRecognition();
             setupWalletSystem();
@@ -5752,6 +5795,31 @@
             if (nameEl) nameEl.textContent = profile.name || 'User';
             if (idEl) idEl.textContent = profile.userId ? `@${profile.userId}` : '@username';
             if (bioEl) bioEl.textContent = profile.bio || '这个人很懒，什么都没写...';
+
+            // 更新收藏卡片预览
+            const favorited = (db.notes || []).filter(n => n.favorited && n.characterId);
+            const countEl = document.getElementById('profile-collection-count');
+            const previewEl = document.getElementById('profile-collection-preview');
+            if (favorited.length > 0) {
+                if (countEl) countEl.textContent = `${favorited.length} 篇`;
+                if (previewEl) {
+                    // 按角色分组显示预览
+                    const charMap = {};
+                    favorited.forEach(n => {
+                        const char = db.characters.find(c => c.id === n.characterId);
+                        const name = char ? (char.remarkName || char.realName) : '未知角色';
+                        if (!charMap[name]) charMap[name] = 0;
+                        charMap[name]++;
+                    });
+                    const previewText = Object.entries(charMap).slice(0, 3)
+                        .map(([name, count]) => `${escapeHtml(name)}(${count})`)
+                        .join(' · ');
+                    previewEl.innerHTML = previewText + (Object.keys(charMap).length > 3 ? ' …' : '');
+                }
+            } else {
+                if (countEl) countEl.textContent = '';
+                if (previewEl) previewEl.innerHTML = '<span class="placeholder">暂无收藏内容</span>';
+            }
         }
 
         function renderFriendList() {
@@ -5859,6 +5927,12 @@
                 if (!char) { showToast('角色不存在'); return; }
                 sessionStorage.setItem('profileToCharProfile', 'true');
                 openCharProfile(charId);
+            });
+
+            // 收藏卡片点击 → 进入收藏页
+            document.getElementById('profile-collection-card')?.addEventListener('click', () => {
+                renderCollectionPage();
+                switchScreen('collection-screen');
             });
 
         }
@@ -9318,6 +9392,94 @@ ${replyHint}
             return div;
         }
 
+        // --- Collection 收藏页面 ---
+        let collectionFilterCharId = null; // null = 全部
+        let fromCollection = false; // 导航上下文：笔记详情返回时判断是从哪里来的
+
+        function renderCollectionPage() {
+            const container = document.getElementById('collection-list-container');
+            const filterArea = document.getElementById('collection-filter-area');
+            if (!container || !filterArea) return;
+
+            const favorited = (db.notes || []).filter(n => n.favorited && n.characterId);
+
+            // 构建角色 map
+            const charMap = {};
+            favorited.forEach(n => {
+                if (!charMap[n.characterId]) {
+                    const char = db.characters.find(c => c.id === n.characterId);
+                    charMap[n.characterId] = {
+                        name: char ? (char.remarkName || char.realName) : '未知角色',
+                        avatar: char ? (char.avatar || '') : ''
+                    };
+                }
+            });
+            const charIds = Object.keys(charMap);
+
+            // 渲染筛选标签
+            let chipsHtml = '<div class="collection-filter-chip' + (collectionFilterCharId === null ? ' active' : '') + '" data-char-id="">全部</div>';
+            charIds.forEach(id => {
+                const info = charMap[id];
+                const active = collectionFilterCharId === id ? ' active' : '';
+                const avatarImg = info.avatar ? `<img src="${escapeHtml(info.avatar)}" loading="lazy" onerror="this.style.display='none'">` : '';
+                chipsHtml += `<div class="collection-filter-chip${active}" data-char-id="${escapeHtml(id)}">${avatarImg}${escapeHtml(info.name)}</div>`;
+            });
+            filterArea.innerHTML = chipsHtml;
+
+            // 筛选标签点击
+            filterArea.querySelectorAll('.collection-filter-chip').forEach(el => {
+                el.addEventListener('click', () => {
+                    const val = el.dataset.charId;
+                    collectionFilterCharId = val || null;
+                    renderCollectionPage();
+                });
+            });
+
+            // 筛选笔记
+            const filtered = collectionFilterCharId
+                ? favorited.filter(n => n.characterId === collectionFilterCharId)
+                : favorited;
+            filtered.sort((a, b) => b.timestamp - a.timestamp);
+
+            // 渲染列表
+            if (filtered.length === 0) {
+                container.innerHTML = '<div class="placeholder-text" style="margin-top:40px;"><i data-lucide="bookmark" style="width:32px;height:32px;color:#ccc;"></i><span>暂无收藏笔记</span></div>';
+                if (typeof lucide !== 'undefined') lucide.createIcons();
+                return;
+            }
+
+            container.innerHTML = filtered.map(memo => {
+                const info = charMap[memo.characterId] || {};
+                const date = new Date(memo.timestamp);
+                const dateStr = `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())} ${pad(date.getHours())}:${pad(date.getMinutes())}`;
+                const firstLine = memo.content.split('\n')[0] || '';
+                const summary = firstLine.length > 50 ? firstLine.slice(0, 50) + '…' : firstLine;
+                
+                const avatarImg = info.avatar ? `<img src="${escapeHtml(info.avatar)}" loading="lazy" onerror="this.style.display='none'">` : '';
+                return `<div class="note-item collection-note-item" data-id="${memo.id}">
+                    <div class="note-header">
+                        <div class="note-date">${dateStr}</div>
+                        <div class="collection-note-tag" style="margin-left:auto;">${avatarImg}${escapeHtml(info.name || '未知')}</div>
+                    </div>
+                    <div class="note-summary">${escapeHTML(summary) || '(空)'}</div>
+                </div>`;
+            }).join('');
+
+            // 点击笔记 → 详情页（设置 fromCollection 标记）
+            container.querySelectorAll('.note-item').forEach(el => {
+                el.addEventListener('click', () => {
+                    const id = el.dataset.id;
+                    const memo = db.notes.find(n => n.id === id);
+                    if (memo) {
+                        fromCollection = true;
+                        renderNoteDetail(memo);
+                    }
+                });
+            });
+
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+        }
+
         // --- 笔记页面（从弹窗改为全屏页面）---
         function renderNotePage(charId) {
             const character = db.characters.find(c => c.id === charId);
@@ -9448,15 +9610,8 @@ ${replyHint}
 
         // 笔记详情页事件绑定
         function setupNoteDetailScreen() {
-            // 返回按钮
-            document.getElementById('note-detail-back-btn').addEventListener('click', () => {
-                switchScreen('note-page-screen');
-                if (profileCharId && db.characters.find(c => c.id === profileCharId)) {
-                    renderNotePage(profileCharId);
-                } else {
-                    renderNotePageList();
-                }
-            });
+            // 返回按钮 - 在 setupCollectionScreen 中统一管理导航上下文
+            // (不再在此绑定，避免与 fromCollection 逻辑冲突)
 
             // 编辑按钮
             document.getElementById('note-detail-edit-btn').addEventListener('click', () => {
@@ -9521,6 +9676,31 @@ ${replyHint}
                         await saveData();
                         showToast('笔记已删除');
                         switchScreen('note-page-screen');
+                        renderNotePageList();
+                    }
+                }
+            });
+        }
+
+        // 收藏页面事件绑定
+        function setupCollectionScreen() {
+            document.getElementById('collection-back-btn').addEventListener('click', () => {
+                switchScreen('contacts-screen');
+                renderProfile();
+                renderFriendList();
+            });
+
+            // 监听来自 collection 打开的笔记详情返回
+            document.getElementById('note-detail-back-btn').addEventListener('click', () => {
+                if (fromCollection) {
+                    fromCollection = false;
+                    switchScreen('collection-screen');
+                    renderCollectionPage();
+                } else {
+                    switchScreen('note-page-screen');
+                    if (profileCharId && db.characters.find(c => c.id === profileCharId)) {
+                        renderNotePage(profileCharId);
+                    } else {
                         renderNotePageList();
                     }
                 }
