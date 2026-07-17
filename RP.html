@@ -10002,14 +10002,10 @@ ${replyHint}
 
             _triggerAiReply: async function() {
                 const chat = this.state.currentChat;
-                if (!chat) { console.log('[VC] _triggerAiReply: no chat'); return; }
-                console.log('[VC] _triggerAiReply: calling getCallReply, context length:', this.state.currentCallContext.length);
+                if (!chat) return;
                 const reply = await getCallReply(chat, this.state.callType, this.state.currentCallContext);
-                console.log('[VC] _triggerAiReply: getCallReply returned:', reply ? reply.slice(0,50) : 'null/empty');
                 if (reply && this.state.isCallActive) {
                     this._addAiMessage(reply);
-                } else {
-                    console.log('[VC] _triggerAiReply: skipped, isCallActive:', this.state.isCallActive, 'reply:', !!reply);
                 }
             },
 
@@ -10143,11 +10139,8 @@ ${replyHint}
         async function getCallReply(chat, callType, callContext) {
             const {url, key, model, provider} = db.apiSettings;
             if (!url || !key || !model) {
-                console.log('[VC] getCallReply: missing API settings');
                 return '通话连接不稳定...';
             }
-
-            console.log('[VC] getCallReply: start, provider:', provider, 'model:', model, 'context:', callContext.length, 'history:', (chat.history||[]).length);
 
             const now = new Date();
                const timeStr = `${now.getFullYear()}-${now.getMonth()+1}-${now.getDate()} ${String(now.getHours()).padStart(2,'0')}:${String(now.getMinutes()).padStart(2,'0')}`;
@@ -10225,21 +10218,19 @@ ${replyHint}
                 });
                 if (!response.ok) {
                     const errText = await response.text().catch(() => '');
-                    console.error('[VC] getCallReply API error:', response.status, errText.slice(0,500));
+                    console.error('getCallReply API error:', response.status, errText.slice(0,200));
                     return null;
                 }
                 const data = await response.json();
-                console.log('[VC] getCallReply API response received');
                 let text = '';
                 if (provider === 'gemini') {
                     text = (data.candidates?.[0]?.content?.parts?.[0]?.text || '').trim();
                 } else {
                     text = (data.choices?.[0]?.message?.content || '').trim();
                 }
-                console.log('[VC] getCallReply extracted text length:', text.length);
                 return text || null;
             } catch (e) {
-                console.error('[VC] getCallReply fetch error:', e);
+                console.error('getCallReply error:', e);
                 return null;
             }
         }
