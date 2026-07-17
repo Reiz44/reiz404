@@ -734,6 +734,15 @@
             border-radius: var(--radius-md);
         }
 
+        /* 新消息出现动画 */
+        @keyframes msg-appear {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .message-wrapper.msg-appear {
+            animation: msg-appear 0.3s ease;
+        }
+
         .message-info {
             display: flex;
             flex-direction: column;
@@ -922,7 +931,10 @@
             width: 18px;
             height: 18px;
             flex-shrink: 0;
+            stroke-width: 2;
         }
+        .call-record-bubble .call-icon-green { color: #4CAF50; }
+        .call-record-bubble .call-icon-red { color: #e74c3c; }
 
         .call-record-bubble .call-label {
             font-weight: 500;
@@ -3767,7 +3779,6 @@
             pointer-events: none;
         }
         
-        .vc-btn-hangup .lucide { transform: rotate(135deg); }
         .vc-btn-accept {
             background: #2ecc71;
             color: #fff;
@@ -3903,7 +3914,7 @@
             z-index: 9998;
             padding: 12px 16px;
             padding-top: max(12px, env(safe-area-inset-top));
-            background: rgba(0,0,0,0.9);
+            background: var(--primary-color);
             backdrop-filter: blur(12px);
             -webkit-backdrop-filter: blur(12px);
             transform: translateY(-100%);
@@ -3933,10 +3944,7 @@
         .vc-incoming-name { font-size: 15px; font-weight: 600; color: #fff; }
         .vc-incoming-label { font-size: 12px; color: rgba(255,255,255,0.6); }
         .vc-incoming-actions { display: flex; gap: 12px; flex-shrink: 0; }
-        .vc-incoming-actions .vc-btn { width: 44px; height: 44px; }
-        
-        /* small helper for phone-off icon rotation */
-        .vc-btn-decline .lucide { transform: rotate(135deg); }
+        .vc-incoming-actions .vc-btn { width: 40px; height: 40px; }
 
         /* --- Tutorial Screen Styles --- */
         .tutorial-item {
@@ -5376,7 +5384,14 @@
         };
         const switchScreen = (targetId) => {
             screens.forEach(screen => screen.classList.remove('active'));
-            document.getElementById(targetId)?.classList.add('active');
+            const target = document.getElementById(targetId);
+            if (target) {
+                target.classList.add('active');
+                // 强制重触发 fadeIn 动画（从 display:none 切到 flex 不一定会重播动画）
+                target.style.animation = 'none';
+                void target.offsetHeight;
+                target.style.animation = '';
+            }
             // Close all overlays and sidebars
             const overlays = document.querySelectorAll('.modal-overlay, .action-sheet-overlay, .settings-sidebar');
             overlays.forEach(o => o.classList.remove('visible', 'open'));
@@ -8112,7 +8127,7 @@
                         const bubbleDiv = document.createElement('div');
                         bubbleDiv.className = 'call-record-bubble';
                         bubbleDiv.style.backgroundColor = 'rgba(76, 175, 80, 0.12)';
-                        bubbleDiv.innerHTML = `<i data-lucide="phone" class="call-icon" style="color:#4CAF50;stroke-width:2"></i><span class="call-label" style="color:#4CAF50">语音通话</span><span class="call-status" style="color:#4CAF50">${escapeHTML(duration)}</span>`;
+                        bubbleDiv.innerHTML = `<i data-lucide="phone" class="call-icon call-icon-green"></i><span class="call-label" style="color:#4CAF50">语音通话</span><span class="call-status" style="color:#4CAF50">${escapeHTML(duration)}</span>`;
                         wrapper.appendChild(bubbleDiv);
 
                         if (summary && summary !== '总结生成中…') {
@@ -8129,7 +8144,7 @@
                         const bubbleDiv = document.createElement('div');
                         bubbleDiv.className = 'call-record-bubble';
                         bubbleDiv.style.backgroundColor = 'rgba(231, 76, 60, 0.1)';
-                        bubbleDiv.innerHTML = `<i data-lucide="phone-off" class="call-icon" style="color:#e74c3c;stroke-width:2"></i><span class="call-label" style="color:#e74c3c">语音通话</span><span class="call-status" style="color:#e74c3c">未接</span>`;
+                        bubbleDiv.innerHTML = `<i data-lucide="phone-off" class="call-icon call-icon-red"></i><span class="call-label" style="color:#e74c3c">语音通话</span><span class="call-status" style="color:#e74c3c">未接</span>`;
                         wrapper.appendChild(bubbleDiv);
                         return wrapper;
                     }
@@ -8207,7 +8222,8 @@
             const callInviteMatch = content.match(callInviteRegex);
             const callRecordSummaryRegex = /\[system-display:语音通话记录：(.*?)；(.*?)；(.*)\]/;
             const callRecordSummaryMatch = content.match(callRecordSummaryRegex);
-
+            const callRejectSummaryRegex = /\[system-display:语音通话：(.+?)的来电被拒绝\]/;
+            const callRejectSummaryMatch = content.match(callRejectSummaryRegex);
 
 
            if ((isSent && sentStickerMatch) || (!isSent && receivedStickerMatch)) {
@@ -8368,7 +8384,7 @@
                     bubbleElement.style.backgroundColor = bubbleTheme.bg;
                     bubbleElement.style.color = bubbleTheme.text;
                 }
-                bubbleElement.innerHTML = `<i data-lucide="phone" class="call-icon" style="color:#4CAF50;stroke-width:2"></i><span class="call-label">语音通话</span><span class="call-status">已呼叫</span>`;
+                bubbleElement.innerHTML = `<i data-lucide="phone" class="call-icon call-icon-green"></i><span class="call-label">语音通话</span><span class="call-status">已呼叫</span>`;
             } else if (callRecordSummaryMatch) {
                 const duration = callRecordSummaryMatch[2].trim();
                 const summary = callRecordSummaryMatch[3].trim();
@@ -8378,13 +8394,21 @@
                     bubbleElement.style.backgroundColor = bubbleTheme.bg;
                     bubbleElement.style.color = bubbleTheme.text;
                 }
-                bubbleElement.innerHTML = `<i data-lucide="phone" class="call-icon" style="color:#4CAF50;stroke-width:2"></i><span class="call-label">语音通话</span><span class="call-status">${escapeHTML(duration)}</span>`;
+                bubbleElement.innerHTML = `<i data-lucide="phone" class="call-icon call-icon-green"></i><span class="call-label">语音通话</span><span class="call-status">${escapeHTML(duration)}</span>`;
                 if (summary && summary !== '总结生成中…') {
                     const transcriptDiv = document.createElement('div');
                     transcriptDiv.className = 'voice-transcript active';
                     transcriptDiv.textContent = summary;
                     wrapper.appendChild(transcriptDiv);
                 }
+            } else if (callRejectSummaryMatch) {
+                bubbleElement = document.createElement('div');
+                bubbleElement.className = 'call-record-bubble';
+                if (!chat.useCustomBubbleCss) {
+                    bubbleElement.style.backgroundColor = bubbleTheme.bg;
+                    bubbleElement.style.color = bubbleTheme.text;
+                }
+                bubbleElement.innerHTML = `<i data-lucide="phone-off" class="call-icon call-icon-red"></i><span class="call-label">语音通话</span><span class="call-status">未接</span>`;
             } else if (imageRecogMatch || urlRegex.test(content)) {
                 bubbleElement = document.createElement('div');
                 bubbleElement.className = 'image-bubble';
@@ -8481,14 +8505,18 @@
                     const bubbleElement = createMessageBubbleElement(message);
                     if (bubbleElement) {
                         messageArea.appendChild(bubbleElement);
+                        bubbleElement.classList.add('msg-appear');
                         messageArea.scrollTop = messageArea.scrollHeight;
+                        if (typeof lucide !== 'undefined') lucide.createIcons();
                     }
                 }
             } else { // For group chats
                 const bubbleElement = createMessageBubbleElement(message);
                 if (bubbleElement) {
                     messageArea.appendChild(bubbleElement);
+                    bubbleElement.classList.add('msg-appear');
                     messageArea.scrollTop = messageArea.scrollHeight;
+                    if (typeof lucide !== 'undefined') lucide.createIcons();
                 }
             }
         }
@@ -9586,7 +9614,8 @@ ${replyHint}
 
                 const messages = getMixedContent(fullResponse)
                 if (messages.length > 0) {
-                    for (const item of messages) {
+                    for (let i = 0; i < messages.length; i++) {
+                        const item = messages[i];
                         const receivedTransferRegex = new RegExp(`\\[${escapedRealName}的转账：.*?元；备注：.*?\\]`);
                         const giftRegex = new RegExp(`\\[${escapedRealName}送来的礼物：.*?\\]`);
                         const message = {
@@ -9603,6 +9632,10 @@ ${replyHint}
                         }
                         chat.history.push(message);
                         await addMessageBubble(message);
+                        // 逐条出现延迟
+                        if (i < messages.length - 1) {
+                            await new Promise(r => setTimeout(r, 1000 + Math.random() * 400));
+                        }
                     }
                 } else {
                     const simpleMessage = {
@@ -9634,7 +9667,8 @@ ${replyHint}
                 const messages = getMixedContent(fullResponse)
                 let r = /\[(.*?)((?:的消息|的语音|发送的表情包|发来的照片\/视频|引用了".*?"的消息并回复))：/
                 if (messages.length > 0) {
-                    for (const item of messages) {
+                    for (let i = 0; i < messages.length; i++) {
+                        const item = messages[i];
                         const nameMatch = item.content.match(r);
                         if (nameMatch || item.char) {
                             const senderName = item.char || (nameMatch[1]);
@@ -9651,6 +9685,10 @@ ${replyHint}
                                 group.history.push(message);
                                 await addMessageBubble(message);
                             }
+                        }
+                        // 逐条出现延迟
+                        if (i < messages.length - 1) {
+                            await new Promise(r => setTimeout(r, 600 + Math.random() * 400));
                         }
                     }
                 } else {
@@ -9823,7 +9861,6 @@ ${replyHint}
             startCall: function(chat) {
                 if (this.state.isCallActive) return;
                 this.state.currentChat = chat;
-                this.state.isIncoming = false;
                 this.state.callType = 'voice';
                 this.state.currentCallContext = [];
                 this.state.seconds = 0;
@@ -10090,11 +10127,13 @@ ${replyHint}
                     } else if (this.state.isIncoming && !this.state.isCallActive) {
                         // 拒绝来电
                         const name = chat.remarkName || chat.realName || '对方';
+                        const callInitiator = this.state.isIncoming ? 'ai' : 'user';
                         chat.history.push({
-                            id: `msg_call_${Date.now()}`,
-                            role: 'system',
+                            id: `msg_call_${Date.now()}_${Math.random().toString(36).slice(2,5)}`,
+                            role: callInitiator === 'user' ? 'user' : 'assistant',
                             content: `[system-display:语音通话：${name}的来电被拒绝]`,
-                            timestamp: Date.now()
+                            timestamp: Date.now(),
+                            callInitiator: callInitiator
                         });
                         await saveData();
                         if (typeof renderMessages === 'function' && currentChatId === chat.id) {
@@ -10298,9 +10337,8 @@ ${replyHint}
             // sticker-bar 通话按钮
             document.getElementById('voice-call-btn').addEventListener('click', () => {
                 if (!currentChatId) { showToast('请先进入一个聊天'); return; }
-                const chat = currentChatType === 'private'
-                    ? db.characters.find(c => c.id === currentChatId)
-                    : db.groups.find(g => g.id === currentChatId);
+                if (currentChatType !== 'private') { showToast('仅支持在私聊中使用'); return; }
+                const chat = db.characters.find(c => c.id === currentChatId);
                 if (!chat) { showToast('找不到聊天对象'); return; }
                 VideoCallModule.startCall(chat);
             });
@@ -11852,6 +11890,10 @@ ${replyHint}
                 const file = event.target.files[0];
                 if (!file) return;
                 if (confirm('此操作将覆盖当前所有聊天记录和设置。此操作不可撤销。确定要继续吗？')){
+                    // 持久显示导入中的提示
+                    toastElement.textContent = '正在导入数据，请稍候...';
+                    toastElement.classList.add('show');
+                    let importToastTimer = null;
                     try {
                         const decompressionStream = new DecompressionStream('gzip');
                         const decompressedStream = file.stream().pipeThrough(decompressionStream);
@@ -11865,13 +11907,15 @@ ${replyHint}
                             throw new Error('文件格式不兼容：缺少必要字段（characters/groups/apiSettings），请检查备份文件。');
                         }
                         await saveData(data);
-                        showToast('数据已成功恢复，应用即将刷新');
-                        window.location.reload();
+                        toastElement.textContent = '数据已成功恢复，应用即将刷新';
+                        importToastTimer = setTimeout(() => window.location.reload(), 1500);
                     } catch (error) {
                         console.error('导入失败:', error);
-                        showToast(`解压或解析文件时发生错误: ${error.message}`);
+                        toastElement.textContent = `导入失败: ${error.message}`;
+                        importToastTimer = setTimeout(() => toastElement.classList.remove('show'), 3000);
                     } finally {
                         event.target.value = null;
+                        if (!importToastTimer) setTimeout(() => toastElement.classList.remove('show'), 3000);
                     }
                 } else {
                     event.target.value = null;
