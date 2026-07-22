@@ -17,7 +17,7 @@
             --bg-color: #f2f2f7;
             --primary-color: #585858;
             --secondary-color: #797979;
-            --accent-color: #A6A6A6;
+
             --text-color: #444;
             --white-color: #ffffff;
             --neutral-color: #6c757d;
@@ -693,6 +693,8 @@
             overflow-y: auto;
             padding: 0 12px;
             scroll-behavior: smooth;
+            display: flex;
+            flex-direction: column;
         }
 
         .message-wrapper {
@@ -743,6 +745,35 @@
             animation: msg-appear 0.3s ease;
         }
 
+        /* 回到最新消息浮动按钮 */
+        .scroll-to-bottom-btn {
+            position: sticky;
+            bottom: 12px;
+            align-self: center;
+            display: none;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 12px;
+            background: rgba(255, 255, 255, 0.95);
+            border: none;
+            background-clip: padding-box;
+            border-radius: 20px;
+            box-shadow: var(--shadow-2);
+            cursor: pointer;
+            font-size: 12px;
+            color: var(--neutral-color);
+            z-index: 10;
+            transition: opacity 0.2s;
+        }
+        .scroll-to-bottom-btn:hover {
+            background: #fff;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.12);
+        }
+        .scroll-to-bottom-btn .lucide {
+            width: 14px;
+            height: 14px;
+        }
+
         .message-info {
             display: flex;
             flex-direction: column;
@@ -777,7 +808,7 @@
 
         .message-bubble {
             max-width: 260px;
-            padding: 8px 12px;
+            padding: 8px 10px;
             border-radius: var(--radius-md);
             word-wrap: break-word;
             line-height: 1.4;
@@ -2005,11 +2036,10 @@
         .world-book-card {
             display: flex;
             align-items: center;
-            padding: 12px 16px;
+            padding: 16px;
             border-radius: var(--radius-md);
-            border: 2px solid var(--primary-color);
             border-left: 4px solid var(--primary-color);
-            background: var(--white-color);
+            background: var(--bg-color);
             box-shadow: var(--shadow-2);
             cursor: pointer;
             transition: box-shadow 0.2s, border-color 0.2s;
@@ -2058,7 +2088,8 @@
 
         .world-book-card .wb-card-preview {
             font-size: 13px;
-            color: var(--neutral-light);
+            color: var(--neutral-color);
+            padding-left: 2px;
             white-space: nowrap;
             overflow: hidden;
             text-overflow: ellipsis;
@@ -2257,7 +2288,119 @@
             margin-top: 0; /* 移除多余的顶部间距 */
         }
 
-        /* --- note（笔记） styles --- */
+        /* 聊天搜索页面 */
+        #chat-search-screen .content {
+            padding: 0;
+        }
+        .chat-search-input-area {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            margin: 0 12px;
+            margin-top: 12px;
+            padding: 8px 12px;
+            background: #f0f0f0;
+            border-radius: 10px;
+            position: relative;
+        }
+        .chat-search-input-icon {
+            width: 18px;
+            height: 18px;
+            color: #999;
+            flex-shrink: 0;
+        }
+        #chat-search-input {
+            flex: 1;
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 15px;
+            line-height: 1.3;
+        }
+        .chat-search-clear-btn {
+            background: none;
+            border: none;
+            padding: 2px;
+            cursor: pointer;
+            color: #999;
+            flex-shrink: 0;
+        }
+        .chat-search-clear-btn:hover {
+            color: #666;
+        }
+        .chat-search-result-count {
+            font-size: 12px;
+            color: #999;
+            padding: 8px 16px;
+        }
+        .chat-search-results {
+            flex: 1;
+            overflow-y: auto;
+            padding: 0 12px 12px;
+        }
+        .chat-search-result-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: background 0.15s;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        .chat-search-result-item:active {
+            background: #f0f0f0;
+        }
+        .chat-search-result-avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+        .chat-search-result-info {
+            flex: 1;
+            min-width: 0;
+        }
+        .chat-search-result-header {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin-bottom: 4px;
+        }
+        .chat-search-result-role {
+            font-size: 12px;
+            font-weight: 600;
+            color: #333;
+        }
+        .chat-search-result-time {
+            font-size: 11px;
+            color: #bbb;
+            margin-left: auto;
+            flex-shrink: 0;
+        }
+        .chat-search-result-content {
+            font-size: 13px;
+            color: #666;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .chat-search-result-content .highlight {
+            color: var(--primary-color, #4A90D9);
+            font-weight: 600;
+        }
+        .chat-search-empty {
+            text-align: center;
+            padding: 40px 20px;
+            color: #ccc;
+            font-size: 14px;
+        }
+
+            /* --- note（笔记） styles --- */
         .note-search-area {
             flex-shrink: 0;
             display: flex;
@@ -3546,6 +3689,7 @@
             gap: 16px;
             overflow-x: auto;
             padding: 4px 0 12px;
+            margin-right: -20px;
             scroll-behavior: smooth;
             -webkit-overflow-scrolling: touch;
             scrollbar-width: none;
@@ -4123,7 +4267,9 @@
             <div class="placeholder"></div>
         </header>
         <main class="content">
-            <div class="message-area" id="message-area"></div>
+            <div class="message-area" id="message-area">
+                <button class="scroll-to-bottom-btn" id="scroll-to-bottom-btn"><i data-lucide="chevron-down"></i> 回到最新</button>
+            </div>
             <div class="typing-indicator" id="typing-indicator"></div>
         </main>
         <div class="chat-input-wrapper">
@@ -4157,6 +4303,9 @@
                 </button>
                 <button class="sticker-bar-btn" id="voice-call-btn" title="语音通话">
                     <i data-lucide="phone"></i>
+                </button>
+                <button class="sticker-bar-btn" id="search-chat-btn" title="搜索聊天记录">
+                    <i data-lucide="search"></i>
                 </button>
             </div>
             <!-- 聊天输入栏 -->
@@ -4329,9 +4478,7 @@
                 <h3 class="profile-section-title">
                     <i data-lucide="users"></i> Friends
                 </h3>
-                <div class="friend-scroll-container" id="friend-scroll-container">
-                    <!-- JS 渲染 -->
-                </div>
+                <div class="friend-scroll-container" id="friend-scroll-container"></div>
                 <div class="placeholder-text" id="no-friends-placeholder" style="display: none;">
                     <p>还没有好友，去创建角色吧</p>
                 </div>
@@ -4430,6 +4577,26 @@
         <main class="content" style="padding: 16px;">
             <div id="note-detail-meta" class="note-detail-meta"></div>
             <div id="note-detail-body" class="note-detail-body"></div>
+        </main>
+    </div>
+
+    <!-- 聊天搜索页面 -->
+    <div id="chat-search-screen" class="screen">
+        <header class="app-header">
+            <button class="back-btn" id="chat-search-back-btn"><i data-lucide="arrow-left"></i></button>
+            <div class="title-container">
+                <h1 class="title">搜索聊天记录</h1>
+            </div>
+            <div class="placeholder"></div>
+        </header>
+        <main class="content">
+            <div class="chat-search-input-area">
+                <i data-lucide="search" class="chat-search-input-icon"></i>
+                <input type="text" id="chat-search-input" placeholder="搜索聊天内容..." autocomplete="off">
+                <button id="chat-search-clear-btn" class="chat-search-clear-btn" style="display:none;"><i data-lucide="x"></i></button>
+            </div>
+            <div id="chat-search-result-count" class="chat-search-result-count"></div>
+            <div id="chat-search-results" class="chat-search-results"></div>
         </main>
     </div>
 
@@ -4585,16 +4752,16 @@
             <h3>创建新角色</h3>
             <form id="add-char-form">
                 <div class="form-group">
-                    <label for="char-real-name">角色姓名</label><input type="text" id="char-real-name"
-                                                                       placeholder="角色的真实姓名" required>
+                    <label for="char-real-name">角色姓名</label>
+                    <input type="text" id="char-real-name" placeholder="角色的真实姓名" required>
                 </div>
                 <div class="form-group">
-                    <label for="char-remark-name">角色备注 (昵称)</label><input type="text" id="char-remark-name"
-                                                                                placeholder="你对Ta的称呼" required>
+                    <label for="char-remark-name">角色备注 (昵称)</label>
+                    <input type="text" id="char-remark-name" placeholder="你对Ta的称呼" required>
                 </div>
                 <div class="form-group">
-                    <label for="my-name-for-char">我的姓名</label><input type="text" id="my-name-for-char"
-                                                                         placeholder="你希望Ta如何称呼你" required>
+                    <label for="my-name-for-char">我的姓名</label>
+                    <input type="text" id="my-name-for-char" placeholder="你希望Ta如何称呼你" required>
                 </div>
                 <button type="submit" class="btn btn-primary">创建</button>
             </form>
@@ -4606,18 +4773,15 @@
             <h3 id="add-sticker-modal-title">添加新表情</h3>
             <form id="add-sticker-form"><input type="hidden" id="sticker-edit-id">
                 <div id="sticker-preview"><span>预览</span></div>
-                <div class="form-group"><label for="sticker-name">表情名称</label><input type="text" id="sticker-name"
-                                                                                         placeholder="如：开心" required>
+                <div class="form-group"><label for="sticker-name">表情名称</label>
+                <input type="text" id="sticker-name" placeholder="如：开心" required>
                 </div>
-                <div class="form-group"><label for="sticker-url-input">表情URL</label><input type="url"
-                                                                                             id="sticker-url-input"
-                                                                                             placeholder="粘贴图片URL">
+                <div class="form-group"><label for="sticker-url-input">表情URL</label>
+                <input type="url" id="sticker-url-input" placeholder="粘贴图片URL">
                 </div>
-                <p style="text-align:center; color:#888; margin: -10px 0 15px;">或</p><input type="file"
-                                                                                             id="sticker-file-upload"
-                                                                                             accept="image/*"
-                                                                                             style="display:none;"><label
-                        for="sticker-file-upload" class="btn btn-secondary" style="width:100%; margin-bottom: 20px;">从本地上传</label>
+                <p style="text-align:center; color:#888; margin: -10px 0 15px;">或</p>
+                <input type="file" id="sticker-file-upload" accept="image/*" style="display:none;">
+                <label for="sticker-file-upload" class="btn btn-secondary" style="width:100%; margin-bottom: 20px;">从本地上传</label>
                 <button type="submit" class="btn btn-primary">保存</button>
             </form>
         </div>
@@ -4652,8 +4816,7 @@
             <form id="send-pv-form">
                 <div class="form-group">
                     <label for="pv-text-input">输入描述</label>
-                    <textarea id="pv-text-input" placeholder="在这里描述你的照片或视频内容..." required
-                              rows="4"></textarea>
+                    <textarea id="pv-text-input" placeholder="在这里描述你的照片或视频内容..." required rows="4"></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary">发送</button>
             </form>
@@ -4683,8 +4846,7 @@
             <form id="send-gift-form">
                 <div class="form-group">
                     <label for="gift-description-input">礼物描述</label>
-                    <textarea id="gift-description-input" placeholder="告诉Ta你送了什么特别的东西..." required
-                              rows="4"></textarea>
+                    <textarea id="gift-description-input" placeholder="告诉Ta你送了什么特别的东西..." required rows="4"></textarea>
                 </div>
                 <button type="submit" class="btn btn-primary">发送</button>
             </form>
@@ -4723,35 +4885,41 @@
         <div class="header">聊天设置</div>
         <div class="content">
             <form id="chat-settings-form">
-                <div class="avatar-setting"><img src="" alt="角色头像" id="setting-char-avatar-preview"
-                                                 class="avatar-preview"><input type="file"
-                                                                               id="setting-char-avatar-upload"
-                                                                               accept="image/*"
-                                                                               style="display:none;"><label
-                        for="setting-char-avatar-upload" class="btn btn-primary"
-                        style="flex-grow:1;">更换角色头像</label></div>
-                <div class="form-group"><label for="setting-char-remark">角色备注 (昵称)</label><input type="text"
-                                                                                                       id="setting-char-remark">
+                <div class="avatar-setting">
+                    <img src="" alt="角色头像" id="setting-char-avatar-preview" class="avatar-preview">
+                    <input type="file" id="setting-char-avatar-upload" accept="image/*" style="display:none;">
+                    <label for="setting-char-avatar-upload" class="btn btn-primary" style="flex-grow:1;">更换角色头像</label>
                 </div>
-                <div class="form-group"><label for="setting-char-persona">角色人设</label><textarea
-                        id="setting-char-persona" placeholder="详细描述角色的性格、背景、说话风格等。"></textarea></div>
+                <div class="form-group">
+                    <label for="setting-char-remark">角色备注 (昵称)</label>
+                    <input type="text" id="setting-char-remark">
+                </div>
+                <div class="form-group">
+                    <label for="setting-char-persona">角色人设</label>
+                    <textarea id="setting-char-persona" placeholder="详细描述角色的性格、背景、说话风格等。"></textarea>
+                </div>
                 <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
-                <div class="avatar-setting"><img src="" alt="我的头像" id="setting-my-avatar-preview"
-                                                 class="avatar-preview"><input type="file" id="setting-my-avatar-upload"
-                                                                               accept="image/*"
-                                                                               style="display:none;"><label
-                        for="setting-my-avatar-upload" class="btn btn-primary"
-                        style="flex-grow:1;">更换我的头像</label></div>
-                <div class="form-group"><label for="setting-my-name">我的姓名</label><input type="text"
-                                                                                            id="setting-my-name"></div>
-                <div class="form-group"><label for="setting-my-persona">我的人设</label><textarea
-                        id="setting-my-persona" placeholder="描述你希望在对话中扮演的形象。"></textarea></div>
+                <div class="avatar-setting">
+                    <img src="" alt="我的头像" id="setting-my-avatar-preview" class="avatar-preview">
+                    <input type="file" id="setting-my-avatar-upload" accept="image/*" style="display:none;">
+                    <label for="setting-my-avatar-upload" class="btn btn-primary" style="flex-grow:1;">更换我的头像</label>
+                </div>
+                <div class="form-group">
+                    <label for="setting-my-name">我的姓名</label>
+                    <input type="text" id="setting-my-name">
+                </div>
+                <div class="form-group">
+                    <label for="setting-my-persona">我的人设</label>
+                    <textarea id="setting-my-persona" placeholder="描述你希望在对话中扮演的形象。"></textarea>
+                </div>
                 <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
                 <div class="form-group">
                     <button type="button" class="btn btn-secondary" id="link-world-book-btn">关联世界书</button>
                 </div>
-                <div class="form-group"><label for="setting-theme-color">主题颜色 (对方/我方)</label><select
-                        id="setting-theme-color"></select></div>
+                <div class="form-group">
+                    <label for="setting-theme-color">主题颜色 (对方/我方)</label>
+                    <select id="setting-theme-color"></select>
+                </div>
 
                 <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
                 <div class="form-group">
@@ -4770,16 +4938,18 @@
                     </button>
                 </div>
 
-                <div class="form-group"><label for="setting-max-memory">最大记忆轮数</label><input type="number"
-                                                                                                   id="setting-max-memory"
-                                                                                                   value="10" min="1">
+                <div class="form-group">
+                    <label for="setting-max-memory">最大记忆轮数</label>
+                    <input type="number" id="setting-max-memory" value="10" min="1">
                 </div>
-                <div class="form-group"><label for="setting-chat-bg-upload" class="btn btn-primary">更换聊天背景</label><input
-                        type="file" id="setting-chat-bg-upload" accept="image/*" style="display:none;"></div>
+                <div class="form-group">
+                    <label for="setting-chat-bg-upload" class="btn btn-primary">更换聊天背景</label>
+                    <input type="file" id="setting-chat-bg-upload" accept="image/*" style="display:none;">
+                </div>
                 <button type="submit" class="btn btn-primary">保存设置</button>
             </form>
             <hr style="border:none; border-top:1px solid #eee; margin: 20px 0;">
-            <button type="button" class="btn btn-danger" id="clear-chat-history-btn" style="width: auto; padding: 16px; height: auto;">清空聊天记录</button>
+            <button type="button" class="btn btn-danger" id="clear-chat-history-btn" style="width: auto; padding: 12px; height: auto;">清空聊天记录</button>
         </div>
     </div>
     <!-- World Book Selection Modal -->
@@ -4815,8 +4985,7 @@
                 <div class="group-avatar-setting">
                     <img src="" alt="群头像" id="setting-group-avatar-preview" class="group-avatar-preview">
                     <input type="file" id="setting-group-avatar-upload" accept="image/*" style="display:none;">
-                    <label for="setting-group-avatar-upload" class="btn btn-primary"
-                           style="flex-grow:1;">更换群头像</label>
+                    <label for="setting-group-avatar-upload" class="btn btn-primary" style="flex-grow:1;">更换群头像</label>
                 </div>
                 <div class="form-group">
                     <label for="setting-group-name">群名 (AI也可见)</label>
@@ -4826,8 +4995,7 @@
                 <div class="avatar-setting">
                     <img src="" alt="我的头像" id="setting-group-my-avatar-preview" class="avatar-preview">
                     <input type="file" id="setting-group-my-avatar-upload" accept="image/*" style="display:none;">
-                    <label for="setting-group-my-avatar-upload" class="btn btn-secondary"
-                           style="flex-grow:1;">更换我的头像</label>
+                    <label for="setting-group-my-avatar-upload" class="btn btn-secondary" style="flex-grow:1;">更换我的头像</label>
                 </div>
                 <div class="form-group">
                     <label for="setting-group-my-nickname">我的群昵称</label>
@@ -4866,15 +5034,13 @@
                     </button>
                 </div>
 
-                <div class="form-group"><label for="setting-group-max-memory">最大记忆轮数</label><input type="number"
-                                                                                                         id="setting-group-max-memory"
-                                                                                                         value="10"
-                                                                                                         min="1"></div>
-                <div class="form-group"><label for="setting-group-chat-bg-upload"
-                                               class="btn btn-primary">更换聊天背景</label><input type="file"
-                                                                                                  id="setting-group-chat-bg-upload"
-                                                                                                  accept="image/*"
-                                                                                                  style="display:none;">
+                <div class="form-group">
+                    <label for="setting-group-max-memory">最大记忆轮数</label>
+                    <input type="number" id="setting-group-max-memory" value="10" min="1">
+                </div>
+                <div class="form-group">
+                    <label for="setting-group-chat-bg-upload" class="btn btn-primary">更换聊天背景</label>
+                    <input type="file" id="setting-group-chat-bg-upload" accept="image/*" style="display:none;">
                 </div>
                 <button type="submit" class="btn btn-primary">保存设置</button>
             </form>
@@ -4889,8 +5055,7 @@
             <form id="edit-group-member-form">
                 <input type="hidden" id="editing-member-id">
                 <div class="avatar-setting" style="justify-content: center;">
-                    <img src="" alt="成员头像" id="edit-member-avatar-preview" class="avatar-preview"
-                         style="cursor: pointer;">
+                    <img src="" alt="成员头像" id="edit-member-avatar-preview" class="avatar-preview" style="cursor: pointer;">
                     <input type="file" id="edit-member-avatar-upload" accept="image/*" style="display:none;">
                 </div>
                 <div class="form-group">
@@ -5676,6 +5841,7 @@
             setupGiftSystem();
             setupTimeSkipSystem();
             setupVoiceCallSystem();
+            setupChatSearch();
             setupWorldBookApp();
             setupFontSettingsApp();
             setupGroupChatSystem();
@@ -7942,6 +8108,17 @@
             cancelMultiSelectBtn.addEventListener('click', exitMultiSelectMode);
             deleteSelectedBtn.addEventListener('click', deleteSelectedMessages);
             document.getElementById('cancel-quote-reply-btn').addEventListener('click', cancelQuoteReply);
+
+            // 回到最新消息按钮
+            const scrollToBottomBtn = document.getElementById('scroll-to-bottom-btn');
+            messageArea.addEventListener('scroll', () => {
+                const isNearBottom = messageArea.scrollHeight - messageArea.scrollTop - messageArea.clientHeight < 100;
+                scrollToBottomBtn.style.display = isNearBottom ? 'none' : 'flex';
+            });
+            scrollToBottomBtn.addEventListener('click', () => {
+                messageArea.scrollTo({ top: messageArea.scrollHeight, behavior: 'smooth' });
+                scrollToBottomBtn.style.display = 'none';
+            });
         }
 
         function handleMessageLongPress(messageWrapper, x, y) {
@@ -8106,7 +8283,12 @@
             const end = totalMessages - (currentPage - 1) * MESSAGES_PER_PAGE;
             const start = Math.max(0, end - MESSAGES_PER_PAGE);
             const messagesToRender = chat.history.slice(start, end);
-            if (!isLoadMore) messageArea.innerHTML = '';
+            if (!isLoadMore) {
+                // 保留 scroll-to-bottom-btn，清掉其他子元素
+                const btn = document.getElementById('scroll-to-bottom-btn');
+                messageArea.innerHTML = '';
+                if (btn) messageArea.appendChild(btn);
+            }
             const fragment = document.createDocumentFragment();
             messagesToRender.forEach(msg => {
                 const bubble = createMessageBubbleElement(msg);
@@ -10523,6 +10705,12 @@ ${replyHint}
                 VideoCallModule.startCall(chat);
             });
 
+            // sticker-bar 搜索聊天记录按钮
+            document.getElementById('search-chat-btn').addEventListener('click', () => {
+                if (!currentChatId) { showToast('请先进入一个聊天'); return; }
+                openChatSearch();
+            });
+
             // loading 页取消按钮
             document.getElementById('vc-loading-hangup-btn').addEventListener('click', () => {
                 VideoCallModule.endCall(true);
@@ -10564,6 +10752,249 @@ ${replyHint}
             // 来电 — 拒绝
             document.getElementById('vc-incoming-decline-btn').addEventListener('click', () => {
                 VideoCallModule.endCall(false);
+            });
+        }
+
+        // --- 聊天搜索 ---
+        function openChatSearch() {
+            const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
+            if (!chat) return;
+            const input = document.getElementById('chat-search-input');
+            const resultsContainer = document.getElementById('chat-search-results');
+            const countEl = document.getElementById('chat-search-result-count');
+            const clearBtn = document.getElementById('chat-search-clear-btn');
+            input.value = '';
+            resultsContainer.innerHTML = '';
+            countEl.textContent = '';
+            clearBtn.style.display = 'none';
+            switchScreen('chat-search-screen');
+            if (typeof lucide !== 'undefined') lucide.createIcons();
+            setTimeout(() => input.focus(), 100);
+        }
+
+        // 搜索聊天记录
+        function performChatSearch() {
+            const chat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
+            if (!chat) return;
+            const input = document.getElementById('chat-search-input');
+            const keyword = input.value.trim().toLowerCase();
+            const resultsContainer = document.getElementById('chat-search-results');
+            const countEl = document.getElementById('chat-search-result-count');
+            const clearBtn = document.getElementById('chat-search-clear-btn');
+
+            if (!keyword) {
+                resultsContainer.innerHTML = '';
+                countEl.textContent = '';
+                clearBtn.style.display = 'none';
+                return;
+            }
+
+            clearBtn.style.display = '';
+            const results = [];
+            const history = chat.history || [];
+            for (let i = history.length - 1; i >= 0; i--) {
+                const msg = history[i];
+                const content = msg.content || '';
+                if (content.toLowerCase().includes(keyword)) {
+                    results.push({ index: i, msg });
+                }
+            }
+
+            if (results.length === 0) {
+                countEl.textContent = '未找到匹配的消息';
+                resultsContainer.innerHTML = '<div class="chat-search-empty">没有找到包含「' + escapeHTML(keyword) + '」的消息</div>';
+                return;
+            }
+
+            countEl.textContent = '共找到 ' + results.length + ' 条匹配消息';
+            resultsContainer.innerHTML = '';
+
+            const charAvatar = currentChatType === 'private' ? chat.avatar : '';
+            const myAvatar = currentChatType === 'private' ? chat.myAvatar : (chat.me ? chat.me.avatar : '');
+
+            results.forEach(({ index, msg }) => {
+                const item = document.createElement('div');
+                item.className = 'chat-search-result-item';
+
+                const isUser = msg.role === 'user';
+                const avatarUrl = isUser ? myAvatar : charAvatar;
+                const roleName = isUser ? '我' : (currentChatType === 'private' ? chat.remarkName : (msg.senderId ? '成员' : '我'));
+                const timeStr = msg.timestamp ? formatTime(msg.timestamp) : '';
+
+                // 清理消息内容并高亮关键词
+                const cleanContent = cleanMessageContent(msg.content);
+                const escapedContent = escapeHTML(cleanContent);
+                const highlightedContent = escapedContent.replace(
+                    new RegExp('(' + escapeRegExp(keyword) + ')', 'gi'),
+                    '<span class="highlight">$1</span>'
+                );
+
+                item.innerHTML = `
+                    ${avatarUrl ? `<img class="chat-search-result-avatar" src="${escapeHTML(avatarUrl)}" alt="">` : `<div class="chat-search-result-avatar" style="background:#ddd;border-radius:50%;width:36px;height:36px;flex-shrink:0;"></div>`}
+                    <div class="chat-search-result-info">
+                        <div class="chat-search-result-header">
+                            <span class="chat-search-result-role">${escapeHTML(roleName)}</span>
+                            <span class="chat-search-result-time">${escapeHTML(timeStr)}</span>
+                        </div>
+                        <div class="chat-search-result-content">${highlightedContent}</div>
+                    </div>
+                `;
+
+                item.addEventListener('click', () => {
+                    // 先判断当前聊天是否是搜索的同一个聊天
+                    const currentChat = (currentChatType === 'private') ? db.characters.find(c => c.id === currentChatId) : db.groups.find(g => g.id === currentChatId);
+                    if (currentChat !== chat) {
+                        // 如果不在同一个聊天，先切换
+                        openChatRoom(chat.id, currentChatType);
+                        // 等待渲染完成后滚动
+                        setTimeout(() => scrollToMessage(chat, msg.id), 100);
+                    } else {
+                        switchScreen('chat-room-screen');
+                        scrollToMessage(chat, msg.id);
+                    }
+                });
+
+                resultsContainer.appendChild(item);
+            });
+        }
+
+        // 滚动到某条消息
+        function scrollToMessage(chat, msgId) {
+            if (!msgId) return;
+            const msgEl = document.querySelector(`.message-wrapper[data-id="${CSS.escape(msgId)}"]`);
+            if (msgEl) {
+                msgEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                // 高亮闪烁
+                msgEl.style.transition = 'background 0.3s';
+                msgEl.style.background = 'rgba(74, 144, 217, 0.1)';
+                msgEl.style.borderRadius = '8px';
+                setTimeout(() => {
+                    msgEl.style.background = '';
+                }, 2000);
+            } else {
+                // 消息可能在更早的页面，尝试加载更多
+                showToast('正在加载更早的消息…');
+                const loadMore = () => {
+                    const found = document.querySelector(`.message-wrapper[data-id="${CSS.escape(msgId)}"]`);
+                    if (found) {
+                        found.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        found.style.transition = 'background 0.3s';
+                        found.style.background = 'rgba(74, 144, 217, 0.1)';
+                        found.style.borderRadius = '8px';
+                        setTimeout(() => {
+                            found.style.background = '';
+                        }, 2000);
+                        return;
+                    }
+                    const loadBtn = document.getElementById('load-more-btn');
+                    if (loadBtn && loadBtn.offsetParent !== null) {
+                        loadBtn.click();
+                        setTimeout(loadMore, 300);
+                    } else {
+                        showToast('未找到该消息');
+                    }
+                };
+                setTimeout(loadMore, 300);
+            }
+        }
+
+        // 清理消息内容中的格式包装，提取可读文本
+        function cleanMessageContent(content) {
+            if (!content) return '';
+            let text = content;
+
+            // 先剥掉 [system-display:xxx] 外层
+            const sysOuter = text.match(/^\[system-display:([\s\S]*?)\]$/);
+            if (sysOuter) text = sysOuter[1].trim();
+
+            // 语音通话记录格式：语音通话记录：发起人；时长；总结 → [语音通话] 时长
+            const callRecordMatch = text.match(/^语音通话记录：(.*?)；(.*?)；(.*)/);
+            if (callRecordMatch) return '[语音通话] ' + callRecordMatch[2].trim();
+
+            // [角色名]的来电被拒绝 → [未接来电]
+            if (/^语音通话：.+?的来电被拒绝$/.test(text)) return '[未接来电]';
+
+            // [角色名的消息：内容] → 内容
+            const msgMatch = text.match(/^\[.+?的消息：([\s\S]*?)\]$/);
+            if (msgMatch) return msgMatch[1].trim();
+
+            // [角色名引用了"原文"的消息并回复：内容] → 内容
+            const quoteMatch = text.match(/^\[.+?引用了".*?"的消息并回复：([\s\S]*?)\]$/);
+            if (quoteMatch) return quoteMatch[1].trim();
+
+            // [角色名的语音：内容] → [语音] 内容
+            const voiceMatch = text.match(/^\[.+?的语音：([\s\S]*?)\]$/);
+            if (voiceMatch) return '[语音] ' + voiceMatch[1].trim();
+
+            // [角色名的表情包：xxx] → [表情包]
+            if (/^\[.+?的表情包：/.test(text)) return '[表情包]';
+
+            // [角色名发来的照片/视频：xxx] → [图片]
+            if (/^\[.+?发来的照片\/视频：/.test(text)) return '[图片]';
+
+            // [system-display:xxx] 已经剥过一层了，如果还有剩余内容直接返回
+            if (sysOuter) return text;
+
+            // [角色名给你转账：金额元；备注：xxx] → [转账] xxx
+            const transferMatch = text.match(/^\[.+?给你转账：[\d.]+\u5143；备注：([\s\S]*?)\]$/);
+            if (transferMatch) return '[转账] ' + (transferMatch[1] || '').trim();
+
+            // [角色名送来的礼物：xxx] → [礼物] xxx
+            const giftMatch = text.match(/^\[.+?送来的礼物：([\s\S]*?)\]$/);
+            if (giftMatch) return '[礼物] ' + giftMatch[1].trim();
+
+            // [角色名向角色名发起了语音通话] → [语音通话]
+            if (/^\[.+?向.+?发起了语音通话\]$/.test(text)) return '[语音通话]';
+
+            // [角色名邀请xxx加入了群聊] → [系统通知] xxx
+            const inviteMatch = text.match(/^\[(.+?)邀请(.+?)加入了群聊\]$/);
+            if (inviteMatch) return `[系统通知] ${inviteMatch[1]}邀请${inviteMatch[2]}加入了群聊`;
+
+            // [角色名修改群名为：xxx] → [系统通知] 修改群名为xxx
+            const renameMatch = text.match(/^\[(.+?)修改群名为：(.*?)\]$/);
+            if (renameMatch) return `[系统通知] ${renameMatch[1]}修改群名为"${renameMatch[2]}"`;
+
+            return text;
+        }
+
+        // 格式化时间（用于搜索结果展示）
+        function formatTime(timestamp) {
+            const d = new Date(timestamp);
+            const now = new Date();
+            const isToday = d.toDateString() === now.toDateString();
+            const pad = n => String(n).padStart(2, '0');
+            const time = pad(d.getHours()) + ':' + pad(d.getMinutes());
+            if (isToday) return time;
+            const yesterday = new Date(now);
+            yesterday.setDate(yesterday.getDate() - 1);
+            if (d.toDateString() === yesterday.toDateString()) return '昨天 ' + time;
+            return pad(d.getMonth() + 1) + '/' + pad(d.getDate()) + ' ' + time;
+        }
+
+        // 转义正则特殊字符
+        function escapeRegExp(string) {
+            return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+        }
+
+        // 聊天搜索事件绑定
+        function setupChatSearch() {
+            const input = document.getElementById('chat-search-input');
+            const clearBtn = document.getElementById('chat-search-clear-btn');
+            const backBtn = document.getElementById('chat-search-back-btn');
+
+            // 输入实时搜索
+            input.addEventListener('input', performChatSearch);
+
+            // 清除按钮
+            clearBtn.addEventListener('click', () => {
+                input.value = '';
+                performChatSearch();
+                input.focus();
+            });
+
+            // 返回按钮
+            backBtn.addEventListener('click', () => {
+                switchScreen('chat-room-screen');
             });
         }
 
