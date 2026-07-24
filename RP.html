@@ -747,9 +747,10 @@
 
         /* 回到最新消息浮动按钮 */
         .scroll-to-bottom-btn {
-            position: sticky;
-            bottom: 12px;
-            align-self: center;
+            position: fixed;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
             display: none;
             align-items: center;
             gap: 4px;
@@ -1739,7 +1740,7 @@
             color: white;
         }
 
-        .btn.spinner {
+        .btn .spinner {
             display: none;
             width: 16px;
             height: 16px;
@@ -4267,9 +4268,8 @@
             <div class="placeholder"></div>
         </header>
         <main class="content">
-            <div class="message-area" id="message-area">
-                <button class="scroll-to-bottom-btn" id="scroll-to-bottom-btn"><i data-lucide="chevron-down"></i> 回到最新</button>
-            </div>
+            <div class="message-area" id="message-area"></div>
+            <button class="scroll-to-bottom-btn" id="scroll-to-bottom-btn"><i data-lucide="chevron-down"></i> 回到最新</button>
             <div class="typing-indicator" id="typing-indicator"></div>
         </main>
         <div class="chat-input-wrapper">
@@ -8284,10 +8284,7 @@
             const start = Math.max(0, end - MESSAGES_PER_PAGE);
             const messagesToRender = chat.history.slice(start, end);
             if (!isLoadMore) {
-                // 保留 scroll-to-bottom-btn，清掉其他子元素
-                const btn = document.getElementById('scroll-to-bottom-btn');
                 messageArea.innerHTML = '';
-                if (btn) messageArea.appendChild(btn);
             }
             const fragment = document.createDocumentFragment();
             messagesToRender.forEach(msg => {
@@ -8841,9 +8838,10 @@
             }
             chat.history.push(message);
             addMessageBubble(message);
-            await saveData();
-            renderChatList();
             messageInput.value = '';
+            // save 不阻塞，后台写入
+            saveData();
+            renderChatList();
             
             // 检查是否需要触发AI发布动态（每x轮对话）
             checkAndTriggerAiMoment(chat, currentChatType);
